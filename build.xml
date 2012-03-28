@@ -1,0 +1,229 @@
+<project name="ChatSSL" default="client" basedir=".">
+	
+	<target name="clean">
+		<delete dir="bin"/>
+	</target>
+
+	<target name="cleankeystore">
+		<delete file="certificate/keystore.ks"/>
+		<delete file="certificate/truststore.ks"/>
+		<delete file="certificate/keystore1.ks"/>
+		<delete file="certificate/keystore2.ks"/>
+		<delete file="certificate/keystore3.ks"/>
+		<delete file="certificate/autorizare_keystore.ks"/>
+		<delete file="certificate/user1.cer"/>
+		<delete file="certificate/user1.crt"/>
+		<delete file="certificate/user1.csr"/>
+		<delete file="certificate/user2.cer"/>
+		<delete file="certificate/user2.crt"/>
+		<delete file="certificate/user2.csr"/>
+		<delete file="certificate/user3.cer"/>
+		<delete file="certificate/user3.crt"/>
+		<delete file="certificate/user3.csr"/>
+		<delete file="certificate/companie.cer"/>
+		<delete file="certificate/companie.crt"/>
+		<delete file="certificate/companie.csr"/>
+		<delete file="certificate/autorizare.cer"/>
+		<delete file="certificate/autorizare.crt"/>
+		<delete file="certificate/autorizare.csr"/>		
+
+
+		<delete file="keystore.ks"/>
+		<delete file="ca.pem"/>
+		<delete file="ca.csr"/>
+		<delete file="ca.key"/>
+	</target>
+
+	<target name="build">
+		<echo message="${line.separator}Chat SSL 
+			${line.separator}
+			${line.separator}UPB 2011 Tema 4
+			${line.separator}
+			${line.separator}
+			${line.separator}"/>
+		<echo message="Compiling..."/>
+		<mkdir dir="bin/"/>
+		<javac srcdir="." destdir="bin" nowarn="on" debug="true" optimize="true" verbose="false"/>
+	</target>
+
+	<target name="keystore" depends="build">
+		<echo message="Creating fresh keystore"/>
+		
+		<exec command="keytool -genkey -alias companie -keyalg DSA -keysize 1024 -keystore certificate/keystore.ks -keypass password 
+		-storepass password -dname &quot;CN=MyCompanyServer, OU=MyCompany, O=MyCompany, C=RO, ST=Romania, L=Bucharest&quot;"/>			
+
+		<exec command="keytool -certreq -keyalg RSA -alias companie -file certificate/companie.csr -keystore certificate/keystore.ks -storepass password" />
+		<exec command="openssl x509 -req -CA ca.pem -CAkey ca.key -set_serial 02 -in certificate/companie.csr -out certificate/companie.crt -days 365 "/>		
+
+		<exec command="keytool -import -alias my_ca -keystore certificate/keystore.ks -trustcacerts -file ca.pem -noprompt -storepass password "/>
+
+		<exec command="keytool -import -alias companie -keystore certificate/keystore.ks -trustcacerts -file certificate/companie.crt -noprompt -storepass password"/>
+
+
+
+		
+		<exec command="keytool -genkey -alias autorizare -keyalg DSA -keysize 1024 -keystore certificate/autorizare_keystore.ks -keypass password 
+
+		-storepass password -dname &quot;CN=ServiciuAutorizare, OU=ServiciuAutorizare, O=MyCompany, C=RO, ST=Romania, L=Bucharest&quot;"/>			
+
+		<exec command="keytool -certreq -keyalg RSA -alias autorizare -file certificate/autorizare.csr -keystore certificate/autorizare_keystore.ks -storepass password" />
+		<exec command="openssl x509 -req -CA ca.pem -CAkey ca.key -set_serial 02 -in certificate/autorizare.csr -out certificate/autorizare.crt -days 365 "/>		
+
+		<exec command="keytool -import -alias my_ca -keystore certificate/autorizare_keystore.ks -trustcacerts -file ca.pem -noprompt -storepass password "/>
+
+		<exec command="keytool -import -alias autorizare -keystore certificate/autorizare_keystore.ks -trustcacerts -file certificate/autorizare.crt -noprompt -storepass password "/>
+		<exec command="keytool -keystore certificate/autorizare_keystore.ks -storepass password -alias autorizare -export -file certificate/autorizare.cer"/>
+		<exec command="keytool -import -alias autorizare -keystore certificate/keystore.ks  -file certificate/autorizare.cer -noprompt -storepass password"/>
+
+
+
+
+
+		<exec command="keytool -genkey -alias user1 -keyalg DSA -keysize 1024 -keystore certificate/keystore1.ks -keypass password 
+		-storepass password -dname &quot;CN=User1, OU=HR, O=MyCompany, C=RO, ST=Romania, L=Bucharest&quot;"/>			
+
+		<exec command="keytool -certreq -keyalg RSA -alias user1 -file certificate/user1.csr -keystore certificate/keystore1.ks -storepass password" />
+		<exec command="openssl x509 -req -CA ca.pem -CAkey ca.key -set_serial 02 -in certificate/user1.csr -out certificate/user1.crt -days 365 "/>		
+
+		<exec command="keytool -import -alias my_ca -keystore certificate/keystore1.ks -trustcacerts -file ca.pem -noprompt -storepass password "/>
+
+		<exec command="keytool -import -alias user1 -keystore certificate/keystore1.ks -trustcacerts -file certificate/user1.crt -noprompt -storepass password "/>
+		<exec command="keytool -keystore certificate/keystore1.ks -storepass password -alias user1 -export -file certificate/user1.cer"/>
+		<exec command="keytool -import -alias user1 -keystore certificate/keystore.ks  -file certificate/user1.cer -noprompt -storepass password"/>
+
+
+
+		<exec command="keytool -genkey -alias user2 -keyalg DSA -keysize 1024 -keystore certificate/keystore2.ks -keypass password 
+		-storepass password -dname &quot;CN=User2, OU=IT, O=MyCompany, C=RO, ST=Romania, L=Bucharest&quot;"/>			
+
+		<exec command="keytool -certreq -keyalg RSA -alias user2 -file certificate/user2.csr -keystore certificate/keystore2.ks -storepass password" />
+		<exec command="openssl x509 -req -CA ca.pem -CAkey ca.key -set_serial 02 -in certificate/user2.csr -out certificate/user2.crt -days 365 "/>		
+
+		<exec command="keytool -import -alias my_ca -keystore certificate/keystore2.ks -trustcacerts -file ca.pem -noprompt -storepass password "/>
+
+		<exec command="keytool -import -alias user2 -keystore certificate/keystore2.ks -trustcacerts -file certificate/user2.crt -noprompt -storepass password "/>
+		<exec command="keytool -keystore certificate/keystore2.ks -storepass password -alias user2 -export -file certificate/user2.cer"/>
+		<exec command="keytool -import -alias user2 -keystore certificate/keystore.ks  -file certificate/user2.cer -noprompt -storepass password"/>
+
+
+
+
+		<exec command="keytool -genkey -alias user3 -keyalg DSA -keysize 1024 -keystore certificate/keystore3.ks -keypass password 
+		-storepass password -dname &quot;CN=User3, OU=Accounting, O=MyCompany, C=RO, ST=Romania, L=Bucharest&quot;"/>			
+
+		<exec command="keytool -certreq -keyalg RSA -alias user3 -file certificate/user3.csr -keystore certificate/keystore3.ks -storepass password" />
+		<exec command="openssl x509 -req -CA ca.pem -CAkey ca.key -set_serial 02 -in certificate/user3.csr -out certificate/user3.crt -days 365 "/>		
+
+		<exec command="keytool -import -alias my_ca -keystore certificate/keystore3.ks -trustcacerts -file ca.pem -noprompt -storepass password "/>
+
+		<exec command="keytool -import -alias user3 -keystore certificate/keystore3.ks -trustcacerts -file certificate/user3.crt -noprompt -storepass password "/>
+		<exec command="keytool -keystore certificate/keystore3.ks -storepass password -alias user3 -export -file certificate/user3.cer"/>
+		<exec command="keytool -import -alias user3 -keystore certificate/keystore.ks  -file certificate/user3.cer -noprompt -storepass password"/>
+
+
+
+
+
+
+	</target>
+
+
+
+	<target name="ca" depends="build">
+		<echo message="Creating CA"/>
+		
+		<exec command="openssl  req -new -newkey rsa:1024 -nodes -out ca.csr -keyout ca.key -subj '/C=RO/ST=Bucharest/L=Bucharst/CN=MyCompany/O=MyCompany'"/>
+
+		<exec command="openssl x509 -trustout -signkey ca.key -days 365 -req -in ca.csr -out ca.pem"/>
+
+		<exec command="keytool -import -keystore keystore.ks -file ca.pem -alias my_ca -storepass password -noprompt"/>	
+
+
+	</target>
+
+
+
+
+	<target name="server" depends="build">
+		<echo message="Running the server..."/>
+		<java classname="com.sprc.chatssl.Server" fork="true">
+			<classpath>
+		    	<pathelement path="bin/"/>
+			</classpath>
+
+			<jvmarg value="-DKeyStore=certificate/keystore.ks"/>
+			<jvmarg value="-DKeyStorePass=password"/>
+			<jvmarg value="-Djavax.net.ssl.trustStore=certificate/truststore.ks"/>
+			<jvmarg value="-Djavax.net.ssl.trustStorePassword=password"/>
+
+			<arg value="5000"/>
+			<arg value="5001"/>
+			<arg value="localhost"/>
+		</java>
+	</target>
+
+	<target name="authorizationService" depends="build">
+		<echo message="Running the authorization service..."/>
+		<java classname="com.sprc.chatssl.AuthorizationService" fork="true">
+			<classpath>
+		    	<pathelement path="bin/"/>
+			</classpath>
+
+			<jvmarg value="-DKeyStore=certificate/autorizare_keystore.ks"/>
+			<jvmarg value="-DKeyStorePass=password"/>
+			<jvmarg value="-Djavax.net.ssl.trustStore=certificate/truststore.ks"/>
+			<jvmarg value="-Djavax.net.ssl.trustStorePassword=password"/>
+
+			<arg value="5001"/>
+		</java>
+	</target>
+
+	<target name="client1">
+		<echo message="Running the client..."/>
+		<java classname="com.sprc.chatssl.Client" fork="true">
+			<classpath>
+	    		<pathelement path="bin/"/>
+			</classpath>
+
+			<jvmarg value="-DKeyStore=certificate/keystore1.ks"/>
+			<jvmarg value="-DKeyStorePass=password"/>
+			<jvmarg value="-Djavax.net.ssl.trustStore=certificate/truststore.ks"/>
+			<jvmarg value="-Djavax.net.ssl.trustStorePassword=password"/>
+			<arg value="localhost"/>
+			<arg value="5000"/>
+	</java>
+	</target>
+	<target name="client2">
+		<echo message="Running the client..."/>
+		<java classname="com.sprc.chatssl.Client" fork="true">
+			<classpath>
+	    		<pathelement path="bin/"/>
+			</classpath>
+					
+			<jvmarg value="-DKeyStore=certificate/keystore2.ks"/>
+			<jvmarg value="-DKeyStorePass=password"/>
+			<jvmarg value="-Djavax.net.ssl.trustStore=certificate/truststore.ks"/>
+			<jvmarg value="-Djavax.net.ssl.trustStorePassword=password"/>
+			<arg value="localhost"/>
+			<arg value="5000"/>
+	</java>
+	</target>
+	<target name="client3">
+		<echo message="Running the client..."/>
+		<java classname="com.sprc.chatssl.Client" fork="true">
+			<classpath>
+	    		<pathelement path="bin/"/>
+			</classpath>
+					
+			<jvmarg value="-DKeyStore=certificate/keystore3.ks"/>
+			<jvmarg value="-DKeyStorePass=password"/>
+			<jvmarg value="-Djavax.net.ssl.trustStore=certificate/truststore.ks"/>
+			<jvmarg value="-Djavax.net.ssl.trustStorePassword=password"/>
+			<arg value="localhost"/>
+			<arg value="5000"/>
+	</java>
+	</target>
+
+
+
+</project>
